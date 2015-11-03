@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+    <head>
+       
+        <script src='http://code.jquery.com/jquery-1.7.2.min.js'></script>
+        <script src='http://localhost:3000/socket.io/socket.io.js'></script>
+        <script>
+            var socket = io.connect('//localhost:3000');
+            
+             socket.on('objTemp', function(data) {
+                $('#line1').html(data.objTemp);
+            });
+              socket.on('ambTemp', function(data) {
+                $('#line2').html(data.ambTemp);
+            });
+            
+            function myFunction(){
+                var x = document.getElementById('line1');
+                alert(x.innerHTML);
+            }
+            myFunction();
+</script>
+
+    </head>
+    <body>
+        <p onload="myFunction()"></p>
+        <img src="http://www.w3schools.com/images/w3schools_green.jpg">
+        <p> objecTemp: OT = </p><p id='line1'></p>
+        <br/>
+        <p> ambTemp: AT = </p><p id='line2' ></p>
+        </body>
+</html>
+        

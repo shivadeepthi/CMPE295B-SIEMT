@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Temperature charts</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="/css/sb-admin.css" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link href="/css/plugins/morris.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+<link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<script type="text/javascript" src="http://www.amcharts.com/lib/3/amcharts.js"></script>
+<script type="text/javascript" src="http://www.amcharts.com/lib/3/serial.js"></script>
+<script type="text/javascript" src="http://www.amcharts.com/lib/3/themes/light.js"></script>
+<script type="text/javascript" src="http://www.amcharts.com/lib/3/funnel.js"></script>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+<script type="text/javascript">
+    window.onload = function () {
+    var dp_temp= <%-JSON.stringify(datapoints)%>;
+    //alert(dp_temp);
+    var dp_temp_avg= <%-JSON.stringify(datapoints_avg)%>;
+   // alert(dp_temp_avg);
+    var dp_temp_range= <%-JSON.stringify(datapoint_range)%>;
+   // alert(dp_temp_range);
+        //initial value of dataPoints 
+    
+var chart = AmCharts.makeChart("chartdiv", {
+    "type": "serial",
+    "theme": "light",
+    "marginRight": 80,
+    "autoMarginOffset": 20,
+    "pathToImages": "http://www.amcharts.com/lib/3/images/",
+
+    "valueAxes": [{
+        "id": "v1",
+        "axisAlpha": 0,
+        "position": "left"
+    }],
+    "balloon": {
+        "borderThickness": 1,
+        "shadowAlpha": 0
+    },
+    "graphs": [{
+        "id": "g1",
+        "bullet": "round",
+        "bulletBorderAlpha": 1,
+        "bulletColor": "#FFFFFF",
+        "bulletSize": 5,
+        "hideBulletsCount": 50,
+        "lineThickness": 2,
+        "title": "red line",
+        "useLineColorForBulletBorder": true,
+        "valueField": "temp_value",
+        "balloonText": "<div style='margin:5px; font-size:19px;'><span style='font-size:13px;'>[[category]]</span><br>[[temp_value]]</div>"
+    }],
+    "chartScrollbar": {
+        "graph": "g1",
+        "scrollbarHeight": 80,
+        "backgroundAlpha": 0,
+        "selectedBackgroundAlpha": 0.1,
+        "selectedBackgroundColor": "#888888",
+        "graphFillAlpha": 0,
+        "graphLineAlpha": 0.5,
+        "selectedGraphFillAlpha": 0,
+        "selectedGraphLineAlpha": 1,
+        "autoGridCount":true,
+        "color":"#AAAAAA"
+    },
+    "chartCursor": {
+        "pan": true,
+        "valueLineEnabled": true,
+        "valueLineBalloonEnabled": true,
+        "cursorAlpha":0,
+        "valueLineAlpha":0.2
+    },
+    "categoryField": "temp_time",
+    "categoryAxis": {
+        
+        "dashLength": 1,
+        "minorGridEnabled": true,
+        "position": "top"
+    },
+    "export": {
+        "enabled": true,
+        "libs": {
+            "path": "http://www.amcharts.com/lib/3/plugins/export/libs/"
+        }
+    },
+    "dataProvider": <%-JSON.stringify(datapoints)%>
+});
+
+chart.addListener("rendered", zoomChart);
+
+zoomChart();
+
+function zoomChart() {
+    chart.zoomToIndexes(chart.dataProvider.length - 40, chart.dataProvider.length - 1);
+}
+
+var chart = AmCharts.makeChart( "chartdiv1", {
+  "type": "serial",
+  "theme": "light",
+  "dataProvider": <%-JSON.stringify(datapoints_avg)%>,
+  "gridAboveGraphs": true,
+  "startDuration": 1,
+  "graphs": [ {
+    "balloonText": "[[category]]: <b>[[value]]</b>",
+    "fillAlphas": 0.8,
+    "lineAlpha": 0.2,
+    "type": "column",
+    "columnWidth": 0.2,
+    "valueField": "value"
+  } ],
+  "chartCursor": {
+    "categoryBalloonEnabled": false,
+    "cursorAlpha": 0,
+    "zoomable": false
+  },
+  "categoryField": "time",
+  "categoryAxis": {
+    "gridPosition": "start",
+    "gridAlpha": 0,
+    
+    "tickPosition": "start",
+    "tickLength": 20
+  },
+  "export": {
+    "enabled": true,
+    "libs": {
+      "path": "http://www.amcharts.com/lib/3/plugins/export/libs/"
+    }
+  }
+
+} );
+
+var chart = AmCharts.makeChart( "chartdiv2", {
+  "type": "funnel",
+  "theme": "light",
+  "dataProvider": <%-JSON.stringify(datapoint_range)%>,
+  "balloon": {
+    "fixedPosition": true
+  },
+  "valueField": "value",
+  "titleField": "range",
+  "marginRight": 240,
+  "marginLeft": 50,
+  "startX": -500,
+  "depth3D": 100,
+  "angle": 40,
+  "outlineAlpha": 1,
+  "outlineColor": "#FFFFFF",
+  "outlineThickness": 2,
+  "labelPosition": "right",
+  "balloonText": "[[range]]: [[value]]n[[description]]",
+  "export": {
+    "enabled": true,
+    "libs": {
+      "path": "http://www.amcharts.com/lib/3/plugins/export/libs/"
+    }
+  }
+} );
+jQuery( '.chart-input' ).off().on( 'input change', function() {
+  var property = jQuery( this ).data( 'property' );
+  var target = chart;
+  var value = Number( this.value );
+  chart.startDuration = 0;
+
+  if ( property == 'innerRadius' ) {
+    value += "%";
+  }
+
+  target[ property ] = value;
+  chart.validateNow();
+} );
+    }
+    </script>
+    <script type="text/javascript" src="/js/canvasjs.min.js"></script>
+     <script src="/js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/js/bootstrap.min.js"></script>
+
+</head>
+ <!-- jQuery -->
+   
+<body>
+
+    <div id="wrapper">
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/dashboard">SIEMT</a>
+            </div>
+            <!-- Top Menu Items -->
+           <ul class="nav navbar-right top-nav">
+                
+              <!--  <li class="button">
+                    <a href="#" ><i class="fa fa-shield"></i></a>
+                </li> -->
+                <li class="dropdown">
+                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> Admin <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="#"><i class="fa fa-fw fa-user"></i> Profile</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-fw fa-envelope"></i> Inbox</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav side-nav">
+                    <li>
+                        <a href="/dashboard"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
+                    </li>
+                    <li >
+                        <a href="/charts/temp"><i class="fa fa-fw fa-bar-chart-o"></i> Temperature</a>
+                    </li>
+                    <li >
+                        <a href="/charts/humidity"><i class="fa fa-fw fa-bar-chart-o"></i> Humidity</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </nav>
+
+        <div id="page-wrapper">
+
+            <div class="container-fluid">
+
+                <!-- Page Heading -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">
+                            Charts
+                        </h1>
+                        <ol class="breadcrumb">
+                            <li>
+                                <i class="fa fa-dashboard"></i>  <a href="/dashboard">Dashboard</a>
+                            </li>
+                            <li class="active">
+                                <i class="fa fa-bar-chart-o"></i> Charts
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                <!-- /.row -->
+                <!-- Flot Charts -->
+                <div class="row">
+                <div class="col-lg-12">
+                <div class="panel panel-primary">
+                <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-bar-chart-o"></i> Line chart</h3>
+                </div>
+                <div class="panel-body">
+                <div class="flot-chart">
+                <div class="flot-chart-content" id="chartdiv"></div>
+                </div>
+                </div>
+                </div>
+                </div>
+<!--                    <div id="chartdiv" style="height: 300px; width: 100;"></div> -->
+                </div>
+                <!-- /.row -->
+
+                <div class="row">
+                <div class="col-lg-6">
+                <div class="panel panel-primary">
+                <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-bar-chart-o"></i> Bar chart</h3>
+                </div>
+                <div class="panel-body">
+                <div class="flot-chart">
+                <div class="flot-chart-content" id="chartdiv1"></div>
+                </div>
+                </div>
+                </div>
+                </div>
+                <div class="col-lg-6" >
+                <div class="panel panel-primary">
+                <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-bar-chart-o"></i> Funnel chart</h3>
+                </div>
+                <div class="panel-body" style="width=100%;height:435px;">
+                <div class="flot-chart">
+                <div class="flot-chart-content" id="chartdiv2"></div>
+                </div>
+                </div>
+                </div>
+                </div>
+                <!--    <div id="chartdiv1" style="height: 300px; width: 100;"></div>-->
+                </div>
+                <!-- /.row -->
+
+                <div class="row">
+                    
+                </div>
+                <!-- /.row -->
+
+                <div class="row">
+                   
+                </div>
+                <!-- /.row -->
+           </div>
+            <!-- /.container-fluid -->
+       </div>
+        <!-- /#page-wrapper -->
+    </div>
+    <!-- /#wrapper -->
+</body>
+
+</html>
