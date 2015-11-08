@@ -20,14 +20,51 @@
 
     <!-- Custom Fonts -->
     <link href="/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript">
+	
+	<script type="text/javascript" src="/js/canvasjs.min.js"></script>
+ 	<script src="/js/jquery.js"></script>
+   	<script src="/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/js/canvasjs.min.js"></script>
+    <script src='http://localhost:3000/socket.io/socket.io.js'></script>
+    
+       
+      <!--  <script>
+              
+            var socket = io.connect('//localhost:3000');
+            
+            socket.on('objTemp', function(data) {
+                $('#objTemp').html(data.objTemp);
+            });
+              socket.on('ambTemp', function(data) {
+                $('#ambTemp').html(data.ambTemp);
+            });
+              socket.on('humTemp', function(data) {
+                $('#humTemp').html(data.humTemp);
+            }); 
+              socket.on('humidity', function(data) {
+                $('#humidity').html(data.humidity);
+            });
+               socket.on('Pressure', function(data) {
+                $('#Pressure').html(data.Pressure);
+            });
+            socket.on('error', function() { console.error(arguments) });
+            socket.on('message', function() { console.log(arguments) });
+            function myFunction(){
+                var x = document.getElementById('Pressure');
+                alert(x.innerHTML);
+            }
+            myFunction();
+           
+        </script>-->
+        
+    <script type="text/javascript">
+     var socket = io.connect('//localhost:3000');
 	window.onload = function () {
 
 		var dps = []; // dataPoints
-
 		var chart = new CanvasJS.Chart("chartContainer",{
 			title :{
-				text: "Live Random Data"
+				text: "Live Data"
 			},			
 			data: [{
 				type: "line",
@@ -36,23 +73,24 @@
 		});
 
 		var xVal = 0;
-		var yVal = 100;	
-		var updateInterval = 80;
-		var dataLength = 500; // number of dataPoints visible at any point
-
+		var yVal = 500;	
+		var updateInterval = 100;
+		var dataLength = 150000; // number of dataPoints visible at any 
+		socket.on('objTemp', function(data) {
+                yVal = data.objTemp;
+            });
+		
 		var updateChart = function (count) {
 			count = count || 1;
-			// count is number of times loop runs to generate random dataPoints.
 			
 			for (var j = 0; j < count; j++) {	
-				yVal = yVal +  Math.round(5 + Math.random() *(-5-5));
-				dps.push({
-					x: xVal,
-					y: yVal
-				});
-				xVal++;
-			};
-			if (dps.length > dataLength)
+ 				xVal = new Date();
+ 				dps.push({
+ 					x: xVal,
+ 					y: yVal
+ 				});
+ 			};
+ 			if (dps.length > dataLength)
 			{
 				dps.shift();				
 			}
@@ -69,18 +107,10 @@
 
 	}
 	</script>
-
-<script type="text/javascript" src="/js/canvasjs.min.js"></script>
- <script src="/js/jquery.js"></script>
-   <script src="/js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="/js/canvasjs.min.js"></script>
-
 </head>
 
 <body>
-
     <div id="wrapper">
-
         <!-- Navigation -->
         <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <!-- Brand and toggle get grouped for better mobile display -->
@@ -136,12 +166,14 @@
                         <a href="/dashboard"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
                     </li>
                     <li>
-                        <a href="/charts/temp"><i class="fa fa-fw fa-bar-chart-o"></i> Temperature Charts</a>
+                        <a href="/temp"><i class="fa fa-fw fa-bar-chart-o"></i> Temperature Charts</a>
                     </li>
                     <li>
-                        <a href="/charts/humidity"><i class="fa fa-fw fa-bar-chart-o"></i> Humidity Charts</a>
+                        <a href="/humidity"><i class="fa fa-fw fa-bar-chart-o"></i> Humidity Charts</a>
                     </li>
-                  
+                    <li>
+                        <a href="/pressure"><i class="fa fa-fw fa-bar-chart-o"></i> Pressure Charts</a>
+                    </li>         
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -167,7 +199,14 @@
 
 
                 <!-- /.row -->
-
+               <div>
+               <p id="objTemp"></p>
+               <p id="ambTemp"></p>
+               <p id="humTemp"></p>
+               <p id="humidity"></p>
+               <p id="Pressure"></p>
+               </div>
+               
                 <div class="row">
                     <div class="col-lg-4 col-md-6">
                         <div class="panel panel-primary">

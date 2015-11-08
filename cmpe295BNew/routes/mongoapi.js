@@ -85,6 +85,95 @@ function updatePassword(callback,username,currentpassword,newpassword){
 		});
 	});
 }
+
+
+
+function insertTemp(callback,objectTemp,ambientTemp){
+	console.log('inserting into mongodb');
+	db=new mongodb.Db('cmpe295b_siemt', new mongodb.Server('ds045704.mongolab.com', 45704, {auto_reconnect:true}), {});
+	db.open(function(err, db) {
+		db.authenticate('username','password',function(err){
+			if(err){
+				throw err;
+			}else{
+				 db.collection('temp', function(err, collection) {
+				        doc = {
+				              "ObjectTemp":objectTemp,
+				              "AmbientTemp":ambientTemp,
+				              "timeStamp":new Date()
+				            }
+				        collection.insert(doc, function(err,res) {
+				        	if(err){
+				        		throw err;
+				        	}else{
+				        		callback(null,res);
+				        		console.log('inserted');
+				        	}
+				            db.close();
+				        });
+				    });
+			}
+		});
+	});
+}
+
+function insertHumd(callback,temperature,humidity){
+	console.log('inserting into mongodb');
+	db=new mongodb.Db('cmpe295b_siemt', new mongodb.Server('ds045704.mongolab.com', 45704, {auto_reconnect:true}), {});
+	db.open(function(err, db) {
+		db.authenticate('username','password',function(err){
+			if(err){
+				throw err;
+			}else{
+				 db.collection('humidity', function(err, collection) {
+				        doc = {
+				              "Temperature":temperature,
+				              "Humidity":humidity,
+				              "timeStamp":new Date()
+				            }
+				        collection.insert(doc, function(err,res) {
+				        	if(err){
+				        		throw err;
+				        	}else{
+				        		callback(null,res);
+				        		console.log('inserted');
+				        	}
+				            db.close();
+				        });
+				    });
+			}
+		});
+	});
+}
+
+function insertPress(callback,pressure){
+	console.log('inserting into mongodb');
+	db=new mongodb.Db('cmpe295b_siemt', new mongodb.Server('ds045704.mongolab.com', 45704, {auto_reconnect:true}), {});
+	db.open(function(err, db) {
+		db.authenticate('username','password',function(err){
+			if(err){
+				throw err;
+			}else{
+				 db.collection('pressure', function(err, collection) {
+				        doc = {
+				              "Pressure":pressure,
+				              "timeStamp":new Date()
+				            }
+				        collection.insert(doc, function(err,res) {
+				        	if(err){
+				        		throw err;
+				        	}else{
+				        		callback(null,res);
+				        		console.log('inserted');
+				        	}
+				            db.close();
+				        });
+				    });
+			}
+		});
+	});
+}
+
 //db.collection('user').findAndModify({ 'userName': username },
 //{$set: { "password": newpassword } },
 function fetchTempChart (callback,chartname){
@@ -264,3 +353,6 @@ exports.alertTemp=alertTemp;
 exports.createUser=createUser;
 exports.checkUser=checkUser;
 exports.updatePassword=updatePassword;
+exports.insertTemp=insertTemp;
+exports.insertHumd=insertHumd;
+exports.insertPress=insertPress;

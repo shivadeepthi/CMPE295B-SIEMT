@@ -113,7 +113,7 @@ app.post("/signup",function(req,res){
 		} else{
 			console.log('user successfully created'+result);
 			res.header("Access-Control-Allow-Origin", "*");	
-			res.render('dashboard',{"userName":username});
+			res.render('dashboard',{"userName":"ADMIN"});
 			var mailOptions={
 					to : email,
 					subject :"account created for SIEMT",
@@ -128,7 +128,6 @@ app.post("/signup",function(req,res){
 					console.log("Message sent: " + response.message);
 					}
 					});
-			
 		}
 		
 	},userfirstname,userlastname,username,email,password,userprofile);
@@ -136,7 +135,9 @@ app.post("/signup",function(req,res){
 	
 });
 
-
+app.get("/temp",function(req,res){
+	res.render('temperature');
+});
 //don't uncomment it
 /*app.get("/", function(req, res){
 SensorTag.discover(function(tag) {
@@ -220,44 +221,67 @@ var io = require('socket.io').listen(app.listen(3000,function(){
 				function  listenForReading(){
 					
 					tag.on('irTemperatureChange', function(objectTemp, ambientTemp) {
-					     console.log('\tObject Temp = %d deg. C', objectTemp.toFixed(1));
-					     console.log('\tAmbient Temp = %d deg. C', ambientTemp.toFixed(1));
+					    // console.log('\tObject Temp = %d deg. C', objectTemp.toFixed(1));
+					    // console.log('\tAmbient Temp = %d deg. C', ambientTemp.toFixed(1));
 					     function TempChange() {
 					       	io.sockets.emit('objTemp', { objTemp: objectTemp });
 					        io.sockets.emit('ambTemp', { ambTemp: ambientTemp });
 					       };
 
 					       TempChange();
+					     /*insert the mongo method here
+					      *  mongo.insertTemp(function(err,result){
+					    	   if(err){
+					    		   throw err;
+					    	   }else{
+					    		   console.log("success for temp");
+					    	   }
+					       },objectTemp,ambientTemp);*/
 					   });
 				}
 				
 					function  listenForHumdReading(){
 					
 						tag.on('humidityChange', function(temperature, humidity){
-							console.log('hum Temp = %d ', temperature.toFixed(1));
-						     console.log('humidity = %d ', humidity.toFixed(1));
+							//console.log('hum Temp = %d ', temperature.toFixed(1));
+						     //console.log('humidity = %d ', humidity.toFixed(1));
 					
 					     function HumdChange() {
-					       	io.sockets.emit('hum Temp', { humTemp: temperature });
+					       	io.sockets.emit('humTemp', { humTemp: temperature });
 					        io.sockets.emit('humidity', { humidity: humidity });
+					       
 					       };
 					       HumdChange();
+					      /*insert mongo method here
+					       *  mongo.insertHumd(function(err,result){
+						    	   if(err){
+						    		   throw err;
+						    	   }else{
+						    		   console.log("success for humd");
+						    	   }
+						       },temperature,humidity);*/
 					   });
 				}
 					function  listenForPress(){
 						
 							tag.on('barometricPressureChange', function(pressure){
-							console.log('barooPressu = %d', pressure.toFixed(1));
+							//console.log('barooPressu = %d', pressure.toFixed(1));
 						
 					     function PressChange() {
 					       	io.sockets.emit('Pressure', { press: pressure });
 					       };
 					       PressChange();
+					    /*insert mongo method here
+					     * 	mongo.insertPress(function(err,result){
+						    	   if(err){
+						    		   throw err;
+						    	   }else{
+						    		   console.log("success for pressure");
+						    	   }
+						       },pressure);*/
 					   });
 				}
-				
 				connectAndSetUpMe();
-
 	});
 })
 );
