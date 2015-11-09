@@ -92,7 +92,7 @@ app.post("/updatePassword",function(req,res){
 });
 
 app.get("/dashboard",function(req,res){
-	res.render('dashboard');
+	res.render('dashboard',{"userName":'ADMIN'});
 });
 
 app.get("/signup",function(req,res){
@@ -136,7 +136,11 @@ app.post("/signup",function(req,res){
 });
 
 app.get("/temp",function(req,res){
-	res.render('temperature');
+	res.render('temperature',{"userName":'ADMIN'});
+});
+
+app.get("/dashboard/rulesengine",function(req,res){
+	res.render('Rulesengine',{"userName":'ADMIN'});
 });
 //don't uncomment it
 /*app.get("/", function(req, res){
@@ -189,7 +193,7 @@ var io = require('socket.io').listen(app.listen(3000,function(){
 		
 		tag.on('disconnect', function() {
 			console.log('disconnected!');
-			delete socket.namespace.sockets[this.id];
+			//delete socket.namespace.sockets[this.id];
 			process.exit(0);
 		});
 		
@@ -252,26 +256,11 @@ var io = require('socket.io').listen(app.listen(3000,function(){
 					       
 					       };
 					       HumdChange();
-					      // insertHumidIntoMongo(temperature,humidity);
-					       insertHumidIntoMongo(temperature,humidity,function(err,result){
-						    	  if(err){
-						    		  throw err;
-						    	  }else{
-						    		  mongo.insertHumd(function(err,result){
-								    	   if(err){
-								    		   throw err;
-								    	   }else{
-								    		   console.log("success for humd");
-								    	   }
-								       },temperature,humidity);
-						    	  }
-						      });
+					      insertHumidIntoMongo(temperature,humidity);
 					   });
 				}
-					function insertHumidIntoMongo(temperature,humidity,callback){
-						console.log('called humid');
-					}
-					/*function insertHumidIntoMongo(temperature,humidity){
+					
+					function insertHumidIntoMongo(temperature,humidity){
 						mongo.insertHumd(function(err,result){
 					    	   if(err){
 					    		   throw err;
@@ -279,7 +268,7 @@ var io = require('socket.io').listen(app.listen(3000,function(){
 					    		   console.log("success for humd");
 					    	   }
 					       },temperature,humidity);
-					}*/
+					}
 					
 					function  listenForPress(){
 							tag.on('barometricPressureChange', function(pressure){
@@ -289,27 +278,11 @@ var io = require('socket.io').listen(app.listen(3000,function(){
 					       	io.sockets.emit('Pressure', { press: pressure }); 	
 					       };
 					       PressChange();
-					      // insertPressIntoMongo(pressure);
-					       insertPressIntoMongo(pressure,function(err,result){
-						    	  if(err){
-						    		  throw err;
-						    	  }else{
-						    		  mongo.insertPress(function(err,result){
-								    	   if(err){
-								    		   throw err;
-								    	   }else{
-								    		   console.log("success for pressure");
-								    	   }
-								       },pressure);	
-						    	  }
-						      });
+					       insertPressIntoMongo(pressure);
 					   });
 				}
-					function insertPressIntoMongo(pressure,callback){
-						console.log('called pressure');
-					}
-					
-					/*function insertPressIntoMongo(pressure){
+								
+					function insertPressIntoMongo(pressure){
 						mongo.insertPress(function(err,result){
 					    	   if(err){
 					    		   throw err;
@@ -317,7 +290,7 @@ var io = require('socket.io').listen(app.listen(3000,function(){
 					    		   console.log("success for pressure");
 					    	   }
 					       },pressure);	
-					}*/
+					}
 				connectAndSetUpMe();
 	});
 })
