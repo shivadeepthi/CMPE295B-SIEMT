@@ -189,6 +189,7 @@ var io = require('socket.io').listen(app.listen(3000,function(){
 		
 		tag.on('disconnect', function() {
 			console.log('disconnected!');
+			delete socket.namespace.sockets[this.id];
 			process.exit(0);
 		});
 		
@@ -217,9 +218,7 @@ var io = require('socket.io').listen(app.listen(3000,function(){
 				tag.notifyBarometricPressure(listenForPress);
 			}
 			
-			
-				function  listenForReading(){
-					
+				function  listenForReading(){		
 					tag.on('irTemperatureChange', function(objectTemp, ambientTemp) {
 					    // console.log('\tObject Temp = %d deg. C', objectTemp.toFixed(1));
 					    // console.log('\tAmbient Temp = %d deg. C', ambientTemp.toFixed(1));
@@ -227,21 +226,22 @@ var io = require('socket.io').listen(app.listen(3000,function(){
 					       	io.sockets.emit('objTemp', { objTemp: objectTemp });
 					        io.sockets.emit('ambTemp', { ambTemp: ambientTemp });
 					       };
-
-					       TempChange();
-					     /*insert the mongo method here
-					      *  mongo.insertTemp(function(err,result){
+					      TempChange();	 
+					      insertTempIntoMongo(objectTemp,ambientTemp);
+					   });
+				}
+				
+				function insertTempIntoMongo(objectTemp,ambientTemp){
+						mongo.insertTemp(function(err,result){
 					    	   if(err){
 					    		   throw err;
 					    	   }else{
 					    		   console.log("success for temp");
 					    	   }
-					       },objectTemp,ambientTemp);*/
-					   });
+					       },objectTemp,ambientTemp);	
 				}
 				
 					function  listenForHumdReading(){
-					
 						tag.on('humidityChange', function(temperature, humidity){
 							//console.log('hum Temp = %d ', temperature.toFixed(1));
 						     //console.log('humidity = %d ', humidity.toFixed(1));
@@ -252,35 +252,72 @@ var io = require('socket.io').listen(app.listen(3000,function(){
 					       
 					       };
 					       HumdChange();
-					      /*insert mongo method here
-					       *  mongo.insertHumd(function(err,result){
-						    	   if(err){
-						    		   throw err;
-						    	   }else{
-						    		   console.log("success for humd");
-						    	   }
-						       },temperature,humidity);*/
+					      // insertHumidIntoMongo(temperature,humidity);
+					       insertHumidIntoMongo(temperature,humidity,function(err,result){
+						    	  if(err){
+						    		  throw err;
+						    	  }else{
+						    		  mongo.insertHumd(function(err,result){
+								    	   if(err){
+								    		   throw err;
+								    	   }else{
+								    		   console.log("success for humd");
+								    	   }
+								       },temperature,humidity);
+						    	  }
+						      });
 					   });
 				}
+					function insertHumidIntoMongo(temperature,humidity,callback){
+						console.log('called humid');
+					}
+					/*function insertHumidIntoMongo(temperature,humidity){
+						mongo.insertHumd(function(err,result){
+					    	   if(err){
+					    		   throw err;
+					    	   }else{
+					    		   console.log("success for humd");
+					    	   }
+					       },temperature,humidity);
+					}*/
+					
 					function  listenForPress(){
-						
 							tag.on('barometricPressureChange', function(pressure){
 							//console.log('barooPressu = %d', pressure.toFixed(1));
 						
 					     function PressChange() {
-					       	io.sockets.emit('Pressure', { press: pressure });
+					       	io.sockets.emit('Pressure', { press: pressure }); 	
 					       };
 					       PressChange();
-					    /*insert mongo method here
-					     * 	mongo.insertPress(function(err,result){
-						    	   if(err){
-						    		   throw err;
-						    	   }else{
-						    		   console.log("success for pressure");
-						    	   }
-						       },pressure);*/
+					      // insertPressIntoMongo(pressure);
+					       insertPressIntoMongo(pressure,function(err,result){
+						    	  if(err){
+						    		  throw err;
+						    	  }else{
+						    		  mongo.insertPress(function(err,result){
+								    	   if(err){
+								    		   throw err;
+								    	   }else{
+								    		   console.log("success for pressure");
+								    	   }
+								       },pressure);	
+						    	  }
+						      });
 					   });
 				}
+					function insertPressIntoMongo(pressure,callback){
+						console.log('called pressure');
+					}
+					
+					/*function insertPressIntoMongo(pressure){
+						mongo.insertPress(function(err,result){
+					    	   if(err){
+					    		   throw err;
+					    	   }else{
+					    		   console.log("success for pressure");
+					    	   }
+					       },pressure);	
+					}*/
 				connectAndSetUpMe();
 	});
 })
