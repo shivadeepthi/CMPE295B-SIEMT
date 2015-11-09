@@ -19,18 +19,41 @@
 
     <!-- Custom Fonts -->
     <link href="/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
+   <script src='http://localhost:3000/socket.io/socket.io.js'></script>
+     
+        <script>
+              
+            var socket = io.connect('//localhost:3000');
+            
+            socket.on('objTemp', function(data) {
+                $('#objTemp').html(data.objTemp);                
+            });
+              socket.on('ambTemp', function(data) {
+                $('#ambTemp').html(data.ambTemp);
+            });
+              socket.on('humTemp', function(data) {
+                $('#humTemp').html(data.humTemp);
+            }); 
+              socket.on('humidity', function(data) {
+                $('#humidity').html(data.humidity);
+            });
+               socket.on('Pressure', function(data) {
+                $('#Pressure').html(data.Pressure);
+            });
+            socket.on('error', function() { console.error(arguments) });
+            socket.on('message', function() { console.log(arguments) });
+           
+        </script>
 </head>
 
 <body>
-
+    <div>
+    <p id="objTemp" style='color:red'></p>
+    <p id="ambTemp" style='color:red'></p>
+    <p id="humTemp" hidden></p>
+    <p id="humidity" hidden></p>
+    <p id="Pressure" hidden></p>
+</div>
     <div id="wrapper">
 
         <!-- Navigation -->
@@ -113,8 +136,7 @@
                                 <i class="fa fa-dashboard"></i>  <a href="/dashboard">Dashboard</a>
                             </li>
                             <li class="active">
-                                <i class="fa fa-edit"></i> Rule Engine
-                            </li>
+                                <i class="fa fa-edit"></i> Rule Engine</li>
                         </ol>
                     </div>
                 </div>
@@ -236,7 +258,7 @@ $(document).ready(function() {
         if(x < max_fields){ //max input box allowed
             x++; //text box increment
             //$(wrapper).append('<div>'+criteria+" "+ criteriaVal+" "+ ruleval+"   " +'<a href="#" class="remove_field">Remove</a><button type="submit" class="btn btn-primary">Test Rule</button></div>'); //add input box
-             $(wrapper).append('<div style="display:inline;"> <div class="col-lg-12"><div class="table-responsive"><table class="table table-hover table-striped"><thead><tr><th style="text-align: left;"></th><th style="text-align: left;"></th><th style="text-align: left;"></th><th style="text-align: left;"></th><th style="text-align: left;"></th></tr></thead><tbody><tr><td style="text-align: left;">'+criteria+'</td><td style="text-align: left;">'+criteriaVal+'</td><td style="text-align: left;">'+ruleval+'</td><td style="text-align: left;">'+Action+'</td><td style="text-align: left;"><button type="submit" class="btn btn-primary" onclick="testrule()">Test Rule</button></td></tr></tbody></table></div></div><br><a style="padding-left:30px" href="#" class="remove_field">Remove</a></div>');
+             $(wrapper).append('<div style="display:inline;"> <div class="col-lg-12"><div class="table-responsive"><table class="table table-hover table-striped"><thead><tr><th style="text-align: left;"></th><th style="text-align: left;"></th><th style="text-align: left;"></th><th style="text-align: left;"></th><th style="text-align: left;"></th></tr></thead><tbody><tr><td style="text-align: left;">'+criteria+'</td><td style="text-align: left;">'+criteriaVal+'</td><td style="text-align: left;">'+ruleval+'</td><td style="text-align: left; id=\'action\'">'+Action+'</td><td style="text-align: left;"><button type="submit" class="btn btn-primary" onclick="testrule()">Test Rule</button></td></tr></tbody></table></div></div><br><a style="padding-left:30px" href="#" class="remove_field">Remove</a></div>');
         }
     });
    
@@ -246,35 +268,44 @@ $(document).ready(function() {
 });
 </script>
 <script type="text/javascript">
-function testrule(){
+ window.onload = function testrule(){
         var criteria=document.getElementById('criteria').value;
         var criteriaVal=document.getElementById('condi');
         var condop=criteriaVal.options[criteriaVal.selectedIndex].value;
         var ruleval=document.getElementById('rulevalue').value;
         var Action=document.getElementById('actionvalue').value;
-    var datastr={
-        "criteria":criteria,
-        "criteriaVal":condop,
-        "ruleval":ruleval,
-        "Action":Action
-    };
+        
+        socket.on('objTemp', function(data) {
+              if(data.objTemp>=ruleval){
+              alert('temp>rulevalue');
+               document.getElementById('action').style.color='red';
+              }
+            });
+       
+    // var datastr={
+    //     "criteria":criteria,
+    //     "criteriaVal":condop,
+    //     "ruleval":ruleval,
+    //     "Action":Action
+    // };
     //alert(JSON.stringify(datastr));
-    $.ajax({
-    type: "POST",
-    data: JSON.stringify(datastr),
-    contentType: 'application/json',
-    url: "/testrule",
-    success: function(data){
-       // alert(data);
-        if(data!=null)
-        alert(Action);
-    else 
-        alert("rules not met");
-    },
-    failure: function(errMsg) {
-        alert(errMsg);
-    }
-});
+//     $.ajax({
+//     type: "POST",
+//     data: JSON.stringify(datastr),
+//     contentType: 'application/json',
+//     url: "/testrule",
+//     success: function(data){
+//        // alert(data);
+//         if(data!=null)
+//         alert(Action);
+//     else 
+//         alert("rules not met");
+//     },
+//     failure: function(errMsg) {
+//         alert(errMsg);
+//     }
+// });
+
 }
 </script>
 </body>

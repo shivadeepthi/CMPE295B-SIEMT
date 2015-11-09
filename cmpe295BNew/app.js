@@ -224,7 +224,7 @@ var io = require('socket.io').listen(app.listen(3000,function(){
 			
 				function  listenForReading(){		
 					tag.on('irTemperatureChange', function(objectTemp, ambientTemp) {
-					    // console.log('\tObject Temp = %d deg. C', objectTemp.toFixed(1));
+					     console.log('\tObject Temp = %d deg. C', objectTemp.toFixed(1));
 					    // console.log('\tAmbient Temp = %d deg. C', ambientTemp.toFixed(1));
 					     function TempChange() {
 					       	io.sockets.emit('objTemp', { objTemp: objectTemp });
