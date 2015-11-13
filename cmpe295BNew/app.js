@@ -193,7 +193,6 @@ var io = require('socket.io').listen(app.listen(3000,function(){
 		
 		tag.on('disconnect', function() {
 			console.log('disconnected!');
-			//delete socket.namespace.sockets[this.id];
 			process.exit(0);
 		});
 		
@@ -227,11 +226,11 @@ var io = require('socket.io').listen(app.listen(3000,function(){
 					     console.log('\tObject Temp = %d deg. C', objectTemp.toFixed(1));
 					    // console.log('\tAmbient Temp = %d deg. C', ambientTemp.toFixed(1));
 					     function TempChange() {
-					       	io.sockets.emit('objTemp', { objTemp: objectTemp });
-					        io.sockets.emit('ambTemp', { ambTemp: ambientTemp });
+					       	io.sockets.emit('objTemp', { objTemp: objectTemp, ambTemp: ambientTemp});
+					        //io.sockets.emit('ambTemp', { ambTemp: ambientTemp });
 					       };
 					      TempChange();	 
-					      insertTempIntoMongo(objectTemp,ambientTemp);
+					      //insertTempIntoMongo(objectTemp,ambientTemp);
 					   });
 				}
 				
@@ -251,12 +250,12 @@ var io = require('socket.io').listen(app.listen(3000,function(){
 						     //console.log('humidity = %d ', humidity.toFixed(1));
 					
 					     function HumdChange() {
-					       	io.sockets.emit('humTemp', { humTemp: temperature });
-					        io.sockets.emit('humidity', { humidity: humidity });
+					       	io.sockets.emit('humTemp', { humTemp: temperature,humidity: humidity });
+					        //io.sockets.emit('humidity', { humidity: humidity });
 					       
 					       };
 					       HumdChange();
-					      insertHumidIntoMongo(temperature,humidity);
+					      //insertHumidIntoMongo(temperature,humidity);
 					   });
 				}
 					
@@ -278,7 +277,7 @@ var io = require('socket.io').listen(app.listen(3000,function(){
 					       	io.sockets.emit('Pressure', { press: pressure }); 	
 					       };
 					       PressChange();
-					       insertPressIntoMongo(pressure);
+					      // insertPressIntoMongo(pressure);
 					   });
 				}
 								

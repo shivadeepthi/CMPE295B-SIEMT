@@ -27,7 +27,39 @@
     <script type="text/javascript" src="/js/canvasjs.min.js"></script>
     <script src='http://localhost:3000/socket.io/socket.io.js'></script>
 
+	<script>  
+            var socket = io.connect('//localhost:3000');
+            socket.on('objTemp', function(data) {
+                //$('#objTemp').html(data.objTemp);
+                $.ajax( { url: "https://api.mongolab.com/api/1/databases/cmpe295b_siemt/collections/temp?apiKey=rvu6pAb1B5s-xO1eQBgXKTWMzRQOHQ-0",
+                data: JSON.stringify( { "ObjectTemp":data.objTemp,
+                                        "AmbientTemp":data.ambTemp,
+                                        "timeStamp":new Date() } ),
+                type: "POST",
+                contentType: "application/json" } );
+            });
+            
 
+              socket.on('humTemp', function(data) {
+                //$('#humTemp').html(data.humTemp);
+                $.ajax( { url: "https://api.mongolab.com/api/1/databases/cmpe295b_siemt/collections/humidity?apiKey=rvu6pAb1B5s-xO1eQBgXKTWMzRQOHQ-0",
+                data: JSON.stringify( { "Temperature":data.humTemp,
+                                        "Humidity":data.humidity,
+                                        "timeStamp":new Date()} ),
+                type: "POST",
+                contentType: "application/json" } );
+            }); 
+
+               socket.on('Pressure', function(data) {
+                //$('#Pressure').html(data.Pressure);
+                $.ajax( { url: "https://api.mongolab.com/api/1/databases/cmpe295b_siemt/collections/pressure?apiKey=rvu6pAb1B5s-xO1eQBgXKTWMzRQOHQ-0",
+                data: JSON.stringify( {  "Pressure":data.Pressure,
+                                        "timeStamp":new Date() } ),
+                type: "POST",
+                contentType: "application/json" } );
+            });         
+        </script>
+        
     <script type="text/javascript">
     var socket = io.connect('//localhost:3000');
     window.onload = function () {
@@ -48,10 +80,11 @@
         var dataLength = 150000; // number of dataPoints visible at any 
         socket.on('objTemp', function(data) {
                 yVal = data.objTemp;
+                 value=data.ambTemp;
             });
-        socket.on('ambTemp', function(data) {
-                value=data.ambTemp;
-            });
+       // socket.on('ambTemp', function(data) {
+              //  value=data.ambTemp;
+           // });
         var updateChart = function (count) {
             count = count || 1;
             
@@ -100,7 +133,7 @@
         "innerRadius": "95%",
         "startValue": 130
              } ],
-        "bottomText": "0 km/h",
+        "bottomText": "0 deg.C",
         "bottomTextYOffset": -20,
         "endValue": 220
             } ],

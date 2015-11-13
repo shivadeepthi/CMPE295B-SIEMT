@@ -28,34 +28,38 @@
     <script src='http://localhost:3000/socket.io/socket.io.js'></script>
     
        
-      <!--  <script>
-              
+      <script>  
             var socket = io.connect('//localhost:3000');
-            
             socket.on('objTemp', function(data) {
-                $('#objTemp').html(data.objTemp);
+                //$('#objTemp').html(data.objTemp);
+                $.ajax( { url: "https://api.mongolab.com/api/1/databases/cmpe295b_siemt/collections/temp?apiKey=rvu6pAb1B5s-xO1eQBgXKTWMzRQOHQ-0",
+                data: JSON.stringify( { "ObjectTemp":data.objTemp,
+                                        "AmbientTemp":data.ambTemp,
+                                        "timeStamp":new Date() } ),
+                type: "POST",
+                contentType: "application/json" } );
             });
-              socket.on('ambTemp', function(data) {
-                $('#ambTemp').html(data.ambTemp);
-            });
+            
+
               socket.on('humTemp', function(data) {
-                $('#humTemp').html(data.humTemp);
+                //$('#humTemp').html(data.humTemp);
+                $.ajax( { url: "https://api.mongolab.com/api/1/databases/cmpe295b_siemt/collections/humidity?apiKey=rvu6pAb1B5s-xO1eQBgXKTWMzRQOHQ-0",
+                data: JSON.stringify( { "Temperature":data.humTemp,
+                                        "Humidity":data.humidity,
+                                        "timeStamp":new Date()} ),
+                type: "POST",
+                contentType: "application/json" } );
             }); 
-              socket.on('humidity', function(data) {
-                $('#humidity').html(data.humidity);
-            });
+
                socket.on('Pressure', function(data) {
-                $('#Pressure').html(data.Pressure);
-            });
-            socket.on('error', function() { console.error(arguments) });
-            socket.on('message', function() { console.log(arguments) });
-            function myFunction(){
-                var x = document.getElementById('Pressure');
-                alert(x.innerHTML);
-            }
-            myFunction();
-           
-        </script>-->
+                //$('#Pressure').html(data.Pressure);
+                $.ajax( { url: "https://api.mongolab.com/api/1/databases/cmpe295b_siemt/collections/pressure?apiKey=rvu6pAb1B5s-xO1eQBgXKTWMzRQOHQ-0",
+                data: JSON.stringify( {  "Pressure":data.Pressure,
+                                        "timeStamp":new Date() } ),
+                type: "POST",
+                contentType: "application/json" } );
+            });         
+        </script>
         
     <script type="text/javascript">
      var socket = io.connect('//localhost:3000');
@@ -104,7 +108,7 @@
 
 		// update chart after specified time. 
 		setInterval(function(){updateChart()}, updateInterval); 
-
+        
 	}
 	</script>
 </head>
