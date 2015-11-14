@@ -138,7 +138,6 @@
 
                 <div class="row">
                     <div class="col-lg-12">
-
                         <form role="form">
 
                             <div class="form-group">
@@ -194,15 +193,16 @@
 
                 <div class="container-fluid">
                     <h2>Configured Rules</h2>
-                    <div class="row">
+                    <div class="row" style="display:inline;">
                     <div class="col-lg-12">
                     <div class="table-responsive">
                         <table class="table table-hover table-striped">
                             <thead>
                                 <tr>
-                                    <th style="text-align: left;">Rule Name</th>
+                                    <th style="text-align: left;">Attribute</th>
                                     <th style="text-align: left;">Criteria</th>
                                     <th style="text-align: left;">Value</th>
+                                    <th style="text-align: left;">Status</th>
                                     <th style="text-align: left;">Actions</th>
                                     <th style="text-align: left;"> </th>
                                    
@@ -232,13 +232,13 @@
 
     <!-- Bootstrap Core JavaScript -->
     <script src="/js/bootstrap.min.js"></script>
+    
+
 <script>
 $(document).ready(function() {
-    var max_fields      = 100; //maximum input boxes allowed
+   
     var wrapper         = $(".input_fields_wrap"); //Fields wrapper
     var add_button      = $("#addrule"); //Add button ID
-    var j=localStorage.length;
-    console.log("j "+j);
     var x = 1; //initial text box count
     $(add_button).click(function(e){ //on add input button click
         e.preventDefault();
@@ -247,77 +247,73 @@ $(document).ready(function() {
         var criteriaVal=document.getElementById('condi').value;
         var datapoint_val=document.getElementById('rulevalue').value;
         var trigger_action=document.getElementById('actionvalue').value;
-        if(x < max_fields){ 
-            x++; 
-             $(wrapper).append('<div style="display:inline;"><div class="col-lg-12"><div class="table-responsive"><table class="table table-condensed"><tbody><tr><td>'+datapoint+'</td><td>'+criteriaVal+'</td><td>'+datapoint_val+'</td><td id=\'action\'">'+trigger_action+'</td><td><a style="padding-left:30px" href="#" class="remove_field">Remove</a></td></tr></tbody></table></div></div></div>');
+        var criterialValN="";
+        
+        if(criteriaVal=="$gte"){
+                criterialValN = ">=";
         }
-        localStorage.removeItem("debug");
-        localStorage.setItem('rule'+j,JSON.stringify([datapoint, criteriaVal, datapoint_val,trigger_action]));
-        j++;
+        else if(criteriaVal=="$gt"){
+        criterialValN = ">";
+        }
+        else if(criteriaVal=="$lt"){
+        criterialValN = "<";
+        }
+        else if(criteriaVal=="$lte"){
+        criterialValN = "<=";
+        }
+        else if (criteriaVal=="$eq"){
+        criterialValN = "=";
+        }
+
+        $.ajax( { url: "https://api.mongolab.com/api/1/databases/cmpe295b_siemt/collections/Rule?apiKey=rvu6pAb1B5s-xO1eQBgXKTWMzRQOHQ-0",
+                  data: JSON.stringify( { "Attribute":datapoint,
+                                        "Rule_Condition":criterialValN,
+                                        "Condition_Value": datapoint_val,
+                                        "Action":trigger_action,
+                                        "Status":"Active" } ),
+                type: "POST",
+                contentType: "application/json" } );
+
+
+
     });
    
-    $(wrapper).on("click",".remove_field", function(e){ //user click on remove text
+    $(wrapper).on("click",".remove_field", function(e){ 
+        $.ajax({
+          url: 'https://api.mongolab.com/api/1/databases/cmpe295b_siemt/collections/Rule?apiKey=rvu6pAb1B5s-xO1eQBgXKTWMzRQOHQ-0',
+          data: JSON.stringify( { _id: this._id } ),
+          type: "PUT",
+          contentType: "application/json" } );
+
+
         e.preventDefault(); 
         $(this).parents('tr').remove(); 
-        x--;
+        //x--;
     })
 });
 </script>
 <script type="text/javascript">
  window.onload = function testrule(){
-     var max_fields      = 100; //maximum input boxes allowed
-     var wrapper         = $(".input_fields_wrap"); //Fields wrapper
-     localStorage.removeItem("debug");
-     console.log("localStorage length "+localStorage.length)
-     if(localStorage.length>0){
-        for(var i=1;i<=localStorage.length;i++) {   
-            var arrval=JSON.parse(localStorage.getItem("rule"+i));
-            console.log("arrval"+arrval+"  "+localStorage.getItem("rule"+i));
-             $(wrapper).append('<div style="display:inline;"> <div class="col-lg-12"><div class="table-responsive"><table class="table table-condensed"><tbody><tr><td>'+arrval[0]+'</td><td>'+arrval[1]+'</td><td>'+arrval[2]+'</td><td id=\'action\'">'+arrval[3]+'</td><td><a style="padding-left:30px" href="#" class="remove_field">Remove</a></td></tr></tbody></table></div></div></div>');    
-          
-       }
-     } 
-        var criteria=document.getElementById('criteria').value;
-        console.log(criteria);
-        var criteriaVal=document.getElementById('condi');
-        console.log(criteriaVal);
-        var condop=criteriaVal.options[criteriaVal.selectedIndex].value;
-        console.log(condop);
-        var ruleval=document.getElementById('rulevalue').value;
-        console.log(ruleval);
-        var Action=document.getElementById('actionvalue').value;
-        console.log(Action);
-        
-       // socket.on('objTemp', function(data) {
-       //        if(data.objTemp>=ruleval){
-       //        alert('temp>rulevalue');
-       //         document.getElementById('action').style.color='red';
-       //        }
-       //      });
-       
-    // var datastr={
-    //     "criteria":criteria,
-    //     "criteriaVal":condop,
-    //     "ruleval":ruleval,
-    //     "Action":Action
-    // };
-    //alert(JSON.stringify(datastr));
-//     $.ajax({
-//     type: "POST",
-//     data: JSON.stringify(datastr),
-//     contentType: 'application/json',
-//     url: "/testrule",
-//     success: function(data){
-//        // alert(data);
-//         if(data!=null)
-//         alert(Action);
-//     else 
-//         alert("rules not met");
-//     },
-//     failure: function(errMsg) {
-//         alert(errMsg);
-//     }
-// });
+ var getdata="";
+  
+     var wrapper= $(".input_fields_wrap"); //Fields wrapper
+    
+
+     $.ajax({
+      url: 'https://api.mongolab.com/api/1/databases/cmpe295b_siemt/collections/Rule?apiKey=rvu6pAb1B5s-xO1eQBgXKTWMzRQOHQ-0',
+      type: 'get',
+      dataType: 'json',
+      success: function (data) {
+      getdata=JSON.parse(JSON.stringify(data));
+          for(var i=1;i<=getdata.length;i++) {  
+               console.log(getdata[i]._id);
+          $(wrapper).append('<div style="display:inline;"> <div class="col-lg-12"><div class="table-responsive"><table class="table table-hover table-striped"><tbody><tr><td>'+getdata[i].Attribute+'</td><td>'+getdata[i].Rule_Condition+'</td><td style="display:none;">'+getdata[i]._id+'</td><td>'+getdata[i].Condition_Value+'</td><td>'+getdata[i].Status+'</td><td id=\'action\'">'+getdata[i].Action+'</td><td><a style="padding-left:30px" href="#" class="remove_field">Remove</a></td></tr></tbody></table></div></div></div>');
+     }
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+        console.log('error', errorThrown);
+      }
+    });
 
 }
 </script>
